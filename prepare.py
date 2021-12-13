@@ -130,6 +130,9 @@ def prepare_articles(df, col, extra_words = [], exclude_words = []):
     #apply the remove_stopwords function to the 'clean' column
     df['clean'] = df['clean'].apply(remove_stopwords, extra_words = extra_words, exclude_words = exclude_words)
 
+    #Remove any entries that did not have a description
+    df.dropna(inplace = True)
+
     return df
 
 def get_char_count(string):
@@ -164,9 +167,9 @@ def get_sentence_count(string):
     """
     This function will take in a string and return the number of sentences in that string.
     """
-    
+
     sentences = nltk.sent_tokenize(string)
-    
+
     return len(sentences)
 
 def get_sentiment_compound(string):
