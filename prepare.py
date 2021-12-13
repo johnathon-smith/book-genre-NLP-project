@@ -131,3 +131,109 @@ def prepare_articles(df, col, extra_words = [], exclude_words = []):
     df['clean'] = df['clean'].apply(remove_stopwords, extra_words = extra_words, exclude_words = exclude_words)
 
     return df
+
+def get_char_count(string):
+    """
+    This function will take in a string and return the number of characters in it.
+    """
+    
+    return len(string)
+
+def get_word_count(string):
+    """
+    This function will take in a string and return the number of words in that string.
+    This function will include repeat words.
+    """
+    
+    #Create a list of words separated by a space
+    words = string.split()
+    
+    return len(words)
+
+def get_unique_words(string):
+    """
+    This function will take in a string and return the number of unique words in that string.
+    """
+    
+    words = string.split()
+    words = set(words)
+    
+    return len(words)
+
+def get_sentence_count(string):
+    """
+    This function will take in a string and return the number of sentences in that string.
+    """
+    
+    sentences = nltk.sent_tokenize(string)
+    
+    return len(sentences)
+
+def get_sentiment_compound(string):
+    """
+    This function will take in a string, analyze the sentiment, and return the compound
+    value.
+    """
+    
+    sia = nltk.sentiment.SentimentIntensityAnalyzer()
+    
+    #sia returns a dict, so access the compound score accordingly
+    compound = sia.polarity_scores(string)['compound']
+    
+    return compound
+
+def get_stopword_count(string):
+    """
+    This function takes in a string and returns the number of stopwords in that string.
+    """
+    
+    #Create a list of the words in the string
+    words = string.split()
+    
+    #Initialize the count var
+    count = 0
+    
+    #Loop through each word and check whether or not it is in the stopword dict
+    #If it is, increase count by 1
+    
+    for word in words:
+        if word in stopwords.words('english'):
+            count += 1
+    
+    return count
+
+def prep_for_exploration(df):
+    """
+    This function takes in the dataframe of prepared book blurbs and performs several functions to create features
+    for exploration. This function will create columns for character counts, word counts, unique word counts,
+    sentence counts, stop word counts, average number of words per sentence, stop word to word ratios, and 
+    sentiment analysis compound scores.
+
+    It returns the updated dataframe.
+    """
+
+    #get the character counts of the lemmatized documents
+    df['lem_char_count'] = df.lemmatized.apply(get_char_count)
+
+    #get the word counts of the lemmatized documents
+    df['lem_word_count'] = df.lemmatized.apply(get_word_count)
+
+    #get the unique word counts of the lemmatized documents
+    df['lem_unique_word_count'] = df.lemmatized.apply(get_unique_words)
+
+    #get the sentence counts
+    df['sentence_count'] = df.original.apply(get_sentence_count)
+
+    #get the average number of words per sentence
+    df['avg_words_per_sentence'] = round(df.lem_word_count / df.sentence_count).astype(int)
+
+    #get the sentiment analysis compound scores of the original documents
+    df['sentiment'] = df.original.apply(get_sentiment_compound)
+
+    #get the stop word counts
+    df['stopword_count'] = df.original.apply(get_stopword_count)
+
+    #get the stop word to word ratio
+    df['word_stopword_ratio'] = round(df.stopword_count / df.lem_word_count, 2)
+
+    return df
