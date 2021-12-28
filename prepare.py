@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 import nltk
+import nltk.sentiment
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.corpus import stopwords
 import unicodedata
@@ -240,3 +242,13 @@ def prep_for_exploration(df):
     df['word_stopword_ratio'] = round(df.stopword_count / df.lem_word_count, 2)
 
     return df
+
+def split(blurbs):
+    """
+    This function takes in a dataframe and performs a train test split.
+    It returns the train and test data frames.
+    """
+    
+    train, test = train_test_split(blurbs, stratify = blurbs.genre, test_size = .25, random_state = 123)
+    
+    return train, test
